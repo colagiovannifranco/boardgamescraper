@@ -1,4 +1,5 @@
 import scrapy
+from items import GameItem
 
 class GameListParser:
     
@@ -52,7 +53,13 @@ class GameListParser:
         average= list(map(self.clean_flotante,average_string))
 
         self.tabla = list(zip(name,year,geek,average,voters))
-        return self.tabla
+        
+        lista_item = []
+
+        for i in self.tabla:
+            game_item = GameItem(name = f'{i[0]}', year = i[1], geek = i[2], average = i[3], voters = i[4])
+            lista_item.append(game_item)
+        return lista_item
 
 class GameSpider(scrapy.Spider):
     name = "games"
@@ -60,14 +67,5 @@ class GameSpider(scrapy.Spider):
 
     def parse(self, response):
         p = GameListParser(response)
-        p.download_tabla()
-        print(p.tabla)
-
-    def guardar_csv(self, tabla):
-        """
-        Esta función recibe los elementos de p.tabla (una lista de 100 tuplas de 5 elements cada una). 
-        Deberia generar un csv para la primer lista, de no existir el csv. De lo contrario, apendearla al final del csv.
-        Tambien tengo que generar nombres de variables 
-        """
-        return
+        return p.download_tabla()
 
